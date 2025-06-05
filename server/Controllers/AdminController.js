@@ -136,6 +136,8 @@ module.exports.AddAttendance = async (req, res) => {
 
 
 module.exports.login = async(req,res) => {
+   console.log(req.query);
+
      const {email , password} = req.body;
      if(!email || !password){
           return res.status(400).json({message: "All fields are required"});
