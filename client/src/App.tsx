@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound";
 import CreateStaff from "./pages/CreateStaff";
 import EditStaff from "./pages/EditStaff";
 import ViewAttendance from "./pages/ViewAttendance ";
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 
 
 const queryClient = new QueryClient();
@@ -29,17 +30,88 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Login />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/staff" element={<Staff />} />
-          <Route path="/staff/create" element={<CreateStaff />} />
-          <Route path="/staff/edit/:id" element={<EditStaff />} />
-          <Route path="/customers" element={<Customers />} />
-          <Route path="/customers/create" element={<CustomerCreate />} />
-          <Route path="/customers/edit/:id" element={<CustomerEdit />} />
-          <Route path="/inventory" element={<Inventory />} />
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/delivery" element={<DeliveryBoy />} />
-          <Route path="//staff/MarkAttendance" element={<ViewAttendance/>} />
+           <Route
+    path="/dashboard"
+    element={
+      <ProtectedRoute allowedRoles={["admin"]}>
+        <Dashboard />
+      </ProtectedRoute>
+    }
+  />
+  <Route
+    path="/staff"
+    element={
+      <ProtectedRoute allowedRoles={["admin"]}>
+        <Staff />
+      </ProtectedRoute>
+    }
+  />
+  <Route
+    path="/staff/create"
+    element={
+      <ProtectedRoute allowedRoles={["admin"]}>
+        <CreateStaff />
+      </ProtectedRoute>
+    }
+  />
+  <Route
+    path="/staff/edit/:id"
+    element={
+      <ProtectedRoute allowedRoles={["admin"]}>
+        <EditStaff />
+      </ProtectedRoute>
+    }
+  />
+   <Route
+    path="/customers"
+    element={
+      <ProtectedRoute allowedRoles={["admin"]}>
+        <Customers />
+      </ProtectedRoute>
+    }
+  />
+  <Route
+    path="/customers/create"
+    element={
+      <ProtectedRoute allowedRoles={["admin"]}>
+        <CustomerCreate />
+      </ProtectedRoute>
+    }
+  />
+  <Route
+    path="/customers/edit/:id"
+    element={
+      <ProtectedRoute allowedRoles={["admin"]}>
+        <CustomerEdit />
+      </ProtectedRoute>
+    }
+  />
+  <Route
+    path="/inventory"
+    element={
+      <ProtectedRoute allowedRoles={["admin"]}>
+        <Inventory />
+      </ProtectedRoute>
+    }
+  />
+   <Route
+    path="/orders"
+    element={
+      <ProtectedRoute allowedRoles={["admin"]}>
+        <Orders />
+      </ProtectedRoute>
+    }
+  />
+  <Route
+    path="/delivery"
+    element={
+      <ProtectedRoute allowedRoles={["staff"]}>
+        <DeliveryBoy />
+      </ProtectedRoute>
+    }
+  />
+          
+          
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

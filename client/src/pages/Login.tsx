@@ -39,6 +39,9 @@ const Login = () => {
      
       localStorage.setItem('email', data.email);
       localStorage.setItem('role', data.role[0]);
+     
+
+     
       
       // Save email if remember me is checked
       if (rememberMe) {
@@ -76,7 +79,7 @@ const Login = () => {
             </div>
           </div>
           <h1 className="text-2xl font-medium tracking-tight text-neutral-dark uppercase">
-            Tiffin Manager Admin
+            The Sehat Wala
           </h1>
         </div>
 
@@ -129,7 +132,7 @@ const Login = () => {
             </button>
           </div>
           
-          <div className="pt-2">
+          {/* <div className="pt-2">
             <button
               type="button"
               onClick={handleDeliveryMode}
@@ -137,7 +140,7 @@ const Login = () => {
             >
               Delivery
             </button>
-          </div>
+          </div> */}
         </form>
       </div>
     </div>
