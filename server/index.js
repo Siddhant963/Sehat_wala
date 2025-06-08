@@ -13,7 +13,7 @@ app.use(cors({
   origin: 'http://localhost:8080',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
-}));
+})); 
 
 // Body Parsers (MUST come before routes!)
 app.use(express.json()); // Parse JSON bodies
