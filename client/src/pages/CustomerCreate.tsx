@@ -103,7 +103,7 @@ const CustomerCreate = () => {
                 placeholder="Full Name"
                 value={formData.name}
                 onChange={handleChange}
-                className="bg-gray-200 p-4 h-14"
+                className="bg-gray-200 p-4 h-14 text-black"
                 required
               />
 
@@ -113,7 +113,7 @@ const CustomerCreate = () => {
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="bg-gray-200 p-4 h-14"
+                className="bg-gray-200 p-4 h-14  text-black"
                 required
               />
 
@@ -122,7 +122,7 @@ const CustomerCreate = () => {
                 placeholder="Contact Number"
                 value={formData.contact}
                 onChange={handleChange}
-                className="bg-gray-200 p-4 h-14"
+                className="bg-gray-200 p-4 h-14  text-black"
                 required
               />
 
@@ -131,7 +131,7 @@ const CustomerCreate = () => {
                 placeholder="Address"
                 value={formData.address}
                 onChange={handleChange}
-                className="bg-gray-200 p-4 h-14"
+                className="bg-gray-200 p-4 h-14  text-black"
                 required
               />
 
@@ -140,7 +140,7 @@ const CustomerCreate = () => {
                 placeholder="Subscription (e.g., 60 days)"
                 value={formData.subscription}
                 onChange={handleChange}
-                className="bg-gray-200 p-4 h-14"
+                className="bg-gray-200 p-4 h-14  text-black"
                 required
               />
 
@@ -152,7 +152,7 @@ const CustomerCreate = () => {
                     type="date"
                     value={formData.subscription_start_date}
                     onChange={handleChange}
-                    className="bg-gray-200 p-4 h-14 w-full"
+                    className="bg-gray-200 p-4 h-14 w-full  text-black"
                   />
                 </div>
                 <div>
@@ -162,7 +162,7 @@ const CustomerCreate = () => {
                     type="date"
                     value={formData.subscription_end_date}
                     onChange={handleChange}
-                    className="bg-gray-200 p-4 h-14 w-full"
+                    className="bg-gray-200 p-4 h-14 w-full  text-black"
                   />
                 </div>
               </div>
@@ -174,7 +174,7 @@ const CustomerCreate = () => {
                     placeholder="Total Meals"
                     value={formData.meals}
                     onChange={handleChange}
-                    className="bg-gray-200 p-4 h-14 w-full"
+                    className="bg-gray-200 p-4 h-14 w-full  text-black"
                   />
                 </div>
                 <div>
@@ -183,7 +183,7 @@ const CustomerCreate = () => {
                     placeholder="Meal Timing (e.g., lunch, dinner)"
                     value={formData.meals_timeing}
                     onChange={handleChange}
-                    className="bg-gray-200 p-4 h-14 w-full"
+                    className="bg-gray-200 p-4 h-14 w-full  text-black"
                   />
                 </div>
               </div>
@@ -194,7 +194,7 @@ const CustomerCreate = () => {
                   value={formData.payment} 
                   onValueChange={handleSelectChange}
                 >
-                  <SelectTrigger className="bg-gray-200 p-4 h-14 w-full">
+                  <SelectTrigger className="bg-gray-200 p-4 h-14 w-full  text-black">
                     <SelectValue placeholder="Select payment status" />
                   </SelectTrigger>
                   <SelectContent>

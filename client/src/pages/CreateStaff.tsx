@@ -97,7 +97,7 @@ const CreateStaff = () => {
                   placeholder="Full Name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="bg-gray-200 p-4 h-14"
+                  className="bg-gray-200 p-4 h-14 text-black"
                   required
                 />
               </div>
@@ -111,7 +111,7 @@ const CreateStaff = () => {
                   type="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="bg-gray-200 p-4 h-14"
+                  className="bg-gray-200 p-4 h-14 text-black"
                   required
                 />
               </div>
@@ -125,7 +125,7 @@ const CreateStaff = () => {
                   type="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="bg-gray-200 p-4 h-14"
+                  className="bg-gray-200 p-4 h-14 text-black"
                   required
                 />
               </div>
@@ -138,7 +138,7 @@ const CreateStaff = () => {
                   placeholder="Contact Number"
                   value={formData.contact}
                   onChange={handleChange}
-                  className="bg-gray-200 p-4 h-14"
+                  className="bg-gray-200 p-4 h-14 text-black"
                   required
                 />
               </div>
@@ -151,14 +151,14 @@ const CreateStaff = () => {
                   placeholder="Salary"
                   value={formData.total_salary}
                   onChange={handleChange}
-                  className="bg-gray-200 p-4 h-14"
+                  className="bg-gray-200 p-4 h-14 text-black"
                   required
                 />
               </div>
               
               <div>
                 <Label>Role</Label>
-                <div className="bg-gray-200 w-full p-4 h-14 rounded-md flex items-center">
+                <div className="bg-gray-200 w-full text-black  p-4 h-14 rounded-md flex items-center">
                   Staff (default)
                 </div>
               </div>

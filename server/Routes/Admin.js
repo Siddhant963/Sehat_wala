@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { RegisterUser , AddCoustomer ,   AddAttendance , login ,logout , getallcoustomers ,getallusers  , getallcoustomersbyfillter , createDeliveriesByMealType , getallDeliveries , getallDeliveriesbyfilter , updateDelivery , updateCoustomer , getallusersbyfillter , assignDeliveryPerson ,deshbordDetails, removeCoustomer , removeUser  ,updateUser ,getTodayAttendance , getAllUserAttendanceForToday, getUsersWithoutAttendanceToday} = require("../Controllers/AdminController");
+const { RegisterUser , AddCoustomer ,   AddAttendance , login ,logout , getallcoustomers ,getallusers  , getallcoustomersbyfillter , createDeliveriesByMealType , getallDeliveries , getallDeliveriesbyfilter , updateDelivery , updateCoustomer , getallusersbyfillter , assignDeliveryPerson ,deshbordDetails, removeCoustomer , removeUser  ,updateUser ,getTodayAttendance , getAllUserAttendanceForToday, getUsersWithoutAttendanceToday , getallStaffusers} = require("../Controllers/AdminController");
 
 router.post('/AddStaff' , RegisterUser);
 router.post('/AddCoustomer', AddCoustomer);
@@ -24,6 +24,7 @@ router.post('/updateUser', updateUser);
 router.get('/getTodayAttendance', getTodayAttendance);
 router.get('/getAllUserAttendanceForToday', getAllUserAttendanceForToday);
 router.get('/getUsersWithoutAttendanceToday', getUsersWithoutAttendanceToday);
+router.get('/getallStaffusers', getallStaffusers);
 
 
 

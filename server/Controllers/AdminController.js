@@ -10,7 +10,8 @@ require('dotenv').config();
 
 module.exports.RegisterUser = async(req , res )=>{ 
      const {name , email , password , contact , total_salary , roles } = req.body;
-
+//   console.log("Received data:", req.body);
+   
      
      if(!name || !email || !password || !contact || !total_salary || !roles){
           return res.status(400).json({message: "All fields are required"});
@@ -230,117 +231,217 @@ module.exports.getallcoustomersbyfillter = async(req,res) => {
      }
 }
 
-module.exports.createDeliveriesByMealType = async (req, res) => {
-     try {
-         const { meal_type, delivery_date } = req.body;
+// module.exports.createDeliveriesByMealType = async (req, res) => {
+//      try {
+//          const { meal_type, delivery_date } = req.body;
          
-         // Validate required fields
-         if (!meal_type || !delivery_date) {
-             return res.status(400).json({ message: "Meal type and delivery date are required" });
-         }
+//          // Validate required fields
+//          if (!meal_type || !delivery_date) {
+//              return res.status(400).json({ message: "Meal type and delivery date are required" });
+//          }
  
-         // Normalize meal type
-         const normalizedMealType = meal_type.toLowerCase().trim();
-     //     console.log(`Received meal type: ${normalizedMealType}`);
+//          // Normalize meal type
+//          const normalizedMealType = meal_type.toLowerCase().trim();
+//      //     console.log(`Received meal type: ${normalizedMealType}`);
          
-         // Validate meal_type
-         const validMealTypes = ['breakfast', 'lunch', 'dinner'];
-         if (!validMealTypes.includes(normalizedMealType)) {
-             return res.status(400).json({ 
-                 message: "Invalid meal type. Must be breakfast, lunch, or dinner" 
-             });
-         }
+//          // Validate meal_type
+//          const validMealTypes = ['breakfast', 'lunch', 'dinner'];
+//          if (!validMealTypes.includes(normalizedMealType)) {
+//              return res.status(400).json({ 
+//                  message: "Invalid meal type. Must be breakfast, lunch, or dinner" 
+//              });
+//          }
  
-     //     console.log(`Searching for customers with meals_timeing containing: ${normalizedMealType}`);
+//      //     console.log(`Searching for customers with meals_timeing containing: ${normalizedMealType}`);
          
-         // Find customers - corrected model name to match your actual model
-         const customers = await Coustomermodel.find({
-             meals_timeing: normalizedMealType
-         });
+//          // Find customers - corrected model name to match your actual model
+//          const customers = await Coustomermodel.find({
+//              meals_timeing: normalizedMealType
+//          });
  
-     //     console.log(`Found ${customers.length} customers with this meal type`);
-         if (customers.length > 0) {
-          //    console.log('Sample customer:', {
-          //        id: customers[0]._id,
-          //        meals_timeing: customers[0].meals_timeing
-          //    });
-         }
+//      //     console.log(`Found ${customers.length} customers with this meal type`);
+//          if (customers.length > 0) {
+//           //    console.log('Sample customer:', {
+//           //        id: customers[0]._id,
+//           //        meals_timeing: customers[0].meals_timeing
+//           //    });
+//          }
  
-         if (!customers || customers.length === 0) {
-             return res.status(404).json({ 
-                 message: "No customers found with the specified meal type"
-             });
-         }
+//          if (!customers || customers.length === 0) {
+//              return res.status(404).json({ 
+//                  message: "No customers found with the specified meal type"
+//              });
+//          }
  
-         // Create deliveries
-         const createdDeliveries = [];
+//          // Create deliveries
+//          const createdDeliveries = [];
          
-         for (const customer of customers) {
+//          for (const customer of customers) {
            
              
-             try {
-               //   console.log(`Checking for existing delivery for customer ${customer._id} on ${delivery_date} for ${normalizedMealType}`);
-                 
-                 // Make sure you're using the correct model name for deliveries
-                 const existingDelivery = await Deliverymodel.findOne({
-                     customer_id: customer._id,
-                     delivery_date: new Date(delivery_date),
-                     meal_type: normalizedMealType
-                 });
+//              try {
+//                //   console.log(`Checking for existing delivery for customer ${customer._id} on ${delivery_date} for ${normalizedMealType}`);
+                
+
+                   
+
+
+//                  // Make sure you're using the correct model name for deliveries
+//                  const existingDelivery = await Deliverymodel.findOne({
+//                      customer_id: customer._id,
+//                      delivery_date: new Date(delivery_date),
+//                      meal_type: normalizedMealType
+//                  });
  
-                 if (existingDelivery) {
-                    //  console.log(`Delivery already exists for customer ${customer._id}`);
-                     continue;
-                 }
+//                  if (existingDelivery) {
+//                     //  console.log(`Delivery already exists for customer ${customer._id}`);
+//                      continue;
+//                  }
  
-               //   console.log(`Creating new delivery for customer ${customer._id}`);
+//                //   console.log(`Creating new delivery for customer ${customer._id}`);
                  
-                 // Use the correct model name here
-                 const newDelivery = new Deliverymodel({
-                     customer_id: customer._id,
-                     meal_type: normalizedMealType,
-                     delivery_date: new Date(delivery_date),
-                     status: 'pending'
-                 });
+//                  // Use the correct model name here
+//                  const newDelivery = new Deliverymodel({
+//                      customer_id: customer._id,
+//                      meal_type: normalizedMealType,
+//                      delivery_date: new Date(delivery_date),
+//                      status: 'pending'
+//                  });
                  
-                 await newDelivery.save();
+//                  await newDelivery.save();
                  
-                 createdDeliveries.push({
-                     _id: newDelivery._id,
-                     customer_id: newDelivery.customer_id,
-                     meal_type: newDelivery.meal_type,
-                     delivery_date: newDelivery.delivery_date
-                 });
+//                  createdDeliveries.push({
+//                      _id: newDelivery._id,
+//                      customer_id: newDelivery.customer_id,
+//                      meal_type: newDelivery.meal_type,
+//                      delivery_date: newDelivery.delivery_date
+//                  });
                  
-               //   console.log(`Created delivery ${newDelivery._id} for customer ${customer._id}`);
-             } catch (customerError) {
-                 console.error(`Error processing customer ${customer._id}:`, customerError);
-                 continue;
-             }
-         } 
+//                //   console.log(`Created delivery ${newDelivery._id} for customer ${customer._id}`);
+//              } catch (customerError) {
+//                  console.error(`Error processing customer ${customer._id}:`, customerError);
+//                  continue;
+//              }
+//          } 
  
-         if (createdDeliveries.length === 0) {
-          //    console.log('No new deliveries were created - all already exist');
-             return res.status(200).json({ 
-                 message: "Deliveries already exist for all matching customers" 
-             });
-         }
+//          if (createdDeliveries.length === 0) {
+//           //    console.log('No new deliveries were created - all already exist');
+//              return res.status(200).json({ 
+//                  message: "Deliveries already exist for all matching customers" 
+//              });
+//          }
  
-     //     console.log(`Successfully created ${createdDeliveries.length} deliveries`);
-         return res.status(201).json({
-             message: `Successfully created ${createdDeliveries.length} deliveries`,
-             data: createdDeliveries
-         });
+//      //     console.log(`Successfully created ${createdDeliveries.length} deliveries`);
+//          return res.status(201).json({
+//              message: `Successfully created ${createdDeliveries.length} deliveries`,
+//              data: createdDeliveries
+//          });
  
-     } catch (error) {
-         console.error("Error in createDeliveriesByMealType:", error);
-         return res.status(500).json({ 
-             message: "Internal server error", 
-             error: error.message 
-         });
-     }
- };
- module.exports.assignDeliveryPerson = async (req, res) => {
+//      } catch (error) {
+//          console.error("Error in createDeliveriesByMealType:", error);
+//          return res.status(500).json({ 
+//              message: "Internal server error", 
+//              error: error.message 
+//          });
+//      }
+//  };
+module.exports.createDeliveriesByMealType = async (req, res) => {
+    try {
+        const { meal_type, delivery_date } = req.body;
+        
+        // Validate required fields
+        if (!meal_type || !delivery_date) {
+            return res.status(400).json({ message: "Meal type and delivery date are required" });
+        }
+
+        // Normalize meal type
+        const normalizedMealType = meal_type.toLowerCase().trim();
+        
+        // Validate meal_type
+        const validMealTypes = ['breakfast', 'lunch', 'dinner'];
+        if (!validMealTypes.includes(normalizedMealType)) {
+            return res.status(400).json({ 
+                message: "Invalid meal type. Must be breakfast, lunch, or dinner" 
+            });
+        }
+        
+        // Find customers with the specified meal type
+        const customers = await Coustomermodel.find({
+            meals_timeing: normalizedMealType
+        });
+
+        if (!customers || customers.length === 0) {
+            return res.status(404).json({ 
+                message: "No customers found with the specified meal type"
+            });
+        }
+
+        // Get all customer IDs
+        const customerIds = customers.map(c => c._id);
+
+        // Check for existing deliveries for these customers on this date with this meal type
+        const existingDeliveries = await Deliverymodel.find({
+            customer_id: { $in: customerIds },
+            delivery_date: new Date(delivery_date),
+            meal_type: normalizedMealType
+        });
+
+        // Get IDs of customers who already have deliveries
+        const existingCustomerIds = existingDeliveries.map(d => d.customer_id.toString());
+
+        // Filter out customers who already have deliveries
+        const customersNeedingDelivery = customers.filter(
+            customer => !existingCustomerIds.includes(customer._id.toString())
+        );
+
+        if (customersNeedingDelivery.length === 0) {
+            return res.status(200).json({ 
+                message: "All customers already have deliveries for this date and meal type",
+                data: []
+            });
+        }
+
+        // Create deliveries only for customers who need them
+        const createdDeliveries = [];
+        
+        for (const customer of customersNeedingDelivery) {
+            try {
+                const newDelivery = new Deliverymodel({
+                    customer_id: customer._id,
+                    meal_type: normalizedMealType,
+                    delivery_date: new Date(delivery_date),
+                    status: 'pending'
+                });
+                
+                await newDelivery.save();
+                
+                createdDeliveries.push({
+                    _id: newDelivery._id,
+                    customer_id: newDelivery.customer_id,
+                    meal_type: newDelivery.meal_type,
+                    delivery_date: newDelivery.delivery_date
+                });
+                
+            } catch (customerError) {
+                console.error(`Error processing customer ${customer._id}:`, customerError);
+                continue;
+            }
+        } 
+
+        return res.status(201).json({
+            message: `Successfully created ${createdDeliveries.length} deliveries`,
+            data: createdDeliveries
+        });
+
+    } catch (error) {
+        console.error("Error in createDeliveriesByMealType:", error);
+        return res.status(500).json({ 
+            message: "Internal server error", 
+            error: error.message 
+        });
+    }
+};
+module.exports.assignDeliveryPerson = async (req, res) => {
      try {
          const { delivery_person_id, delivery_id } = req.body;
          
@@ -842,3 +943,15 @@ module.exports.getUsersWithoutAttendanceToday = async (req, res) => {
     }
 };
 
+
+module.exports.getallStaffusers = async(req,res) => {
+     try {
+          const users = await Usermodel.find(
+                { roles: "staff" } // Filter to get only staff users
+             ).select('-password'
+          );
+          return res.status(200).json({message: "Users fetched successfully", data: users});
+     } catch (error) {
+          return res.status(500).json({message: "Internal server error"});
+     }
+}

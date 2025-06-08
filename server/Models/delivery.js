@@ -14,6 +14,11 @@ const deliverySchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    meal_type: {
+        type: String,
+        enum: ['breakfast', 'lunch', 'dinner'],
+        required: true
+    },
     status: {
         type: String,
         enum: ['pending', 'delivered', 'cancelled'],

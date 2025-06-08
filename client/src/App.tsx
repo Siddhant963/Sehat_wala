@@ -102,6 +102,14 @@ const App = () => (
       </ProtectedRoute>
     }
   />
+   <Route
+    path="/staff/MarkAttendance"
+    element={
+      <ProtectedRoute allowedRoles={["admin"]}>
+        <ViewAttendance />
+      </ProtectedRoute>
+    }
+  />
   <Route
     path="/delivery"
     element={

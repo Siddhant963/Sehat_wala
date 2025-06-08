@@ -69,7 +69,7 @@ const Orders = () => {
         const customersData = await customersRes.json();
         setCustomers(customersData.data || []);
 
-        const usersRes = await fetch('http://localhost:3001/api/admin/getallusers', {
+        const usersRes = await fetch('http://localhost:3001/api/admin/getallStaffusers', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -132,8 +132,10 @@ const Orders = () => {
       if (!res.ok) {
         throw new Error(data.message || 'Failed to create deliveries');
       }
+      console.log(res);
+      
 
-      toast.success(`Successfully created ${data.count || 0} deliveries`);
+      toast.success(`Successfully created  deliveries`);
       await fetchDeliveries(filterStatus);
       setNewDelivery({
         meal_type: 'lunch',
