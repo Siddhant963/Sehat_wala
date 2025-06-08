@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import WeeklyCalendar from '@/components/ui/Calendar';
+import WeeklyCalendar from '../components/ui/calendar';
 import InventoryCard from '@/components/ui/InventoryCard';
 
 const Inventory = () => {
