@@ -18,7 +18,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchdeshbordDetails = async () => {
        
-      const url = "http://localhost:3001/api/admin/deshbordDetails"
+      const url = "http://3.83.158.77:3001/api/admin/deshbordDetails"
       const data = await fetch(url)
       const jsonData = await data.json()
       // console.log(jsonData.data)

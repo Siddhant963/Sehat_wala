@@ -44,7 +44,7 @@ const CreateStaff = () => {
     try {
       setIsSubmitting(true);
       
-      const response = await fetch('http://localhost:3001/api/admin/AddStaff', {
+      const response = await fetch('http://3.83.158.77:3001/api/admin/AddStaff', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

@@ -31,7 +31,7 @@ const ViewAttendance = () => {
     const fetchStaffWithoutAttendance = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`http://localhost:3001/api/admin/getUsersWithoutAttendanceToday`, {
+        const response = await fetch(`http://3.83.158.77:3001/api/admin/getUsersWithoutAttendanceToday`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'application/json'
@@ -85,7 +85,7 @@ const ViewAttendance = () => {
     try {
       const today = format(currentDate, 'yyyy-MM-dd');
 
-      const response = await fetch('http://localhost:3001/api/admin/AddAttendance', {
+      const response = await fetch('http://3.83.158.77:3001/api/admin/AddAttendance', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -105,7 +105,7 @@ const ViewAttendance = () => {
       toast.success(`Attendance marked successfully`);
       
       // Refresh the list after marking attendance
-      const refreshResponse = await fetch(`http://localhost:3001/api/admin/getUsersWithoutAttendanceToday`, {
+      const refreshResponse = await fetch(`http://3.83.158.77:3001/api/admin/getUsersWithoutAttendanceToday`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'

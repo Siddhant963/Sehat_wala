@@ -61,7 +61,7 @@ const Orders = () => {
       try {
         setIsLoading(true);
 
-        const customersRes = await fetch('http://localhost:3001/api/admin/getallcoustomers', {
+        const customersRes = await fetch('http://3.83.158.77:3001/api/admin/getallcoustomers', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -69,7 +69,7 @@ const Orders = () => {
         const customersData = await customersRes.json();
         setCustomers(customersData.data || []);
 
-        const usersRes = await fetch('http://localhost:3001/api/admin/getallStaffusers', {
+        const usersRes = await fetch('http://3.83.158.77:3001/api/admin/getallStaffusers', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -90,7 +90,7 @@ const Orders = () => {
 
   const fetchDeliveries = async (status = 'all') => {
     try {
-      let url = 'http://localhost:3001/api/admin/getallDeliveriesbyfilter';
+      let url = 'http://3.83.158.77:3001/api/admin/getallDeliveriesbyfilter';
       const formData = new URLSearchParams();
 
       if (status !== 'all') {
@@ -118,7 +118,7 @@ const Orders = () => {
       formData.append('meal_type', newDelivery.meal_type);
       formData.append('delivery_date', newDelivery.delivery_date);
 
-      const res = await fetch('http://localhost:3001/api/admin/createDelivery', {
+      const res = await fetch('http://3.83.158.77:3001/api/admin/createDelivery', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -160,7 +160,7 @@ const Orders = () => {
       formData.append('delivery_id', deliveryId);
       formData.append('delivery_person_id', selectedDeliveryPersonId);
 
-      const res = await fetch('http://localhost:3001/api/admin/assignDeliveryPerson', {
+      const res = await fetch('http://3.83.158.77:3001/api/admin/assignDeliveryPerson', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

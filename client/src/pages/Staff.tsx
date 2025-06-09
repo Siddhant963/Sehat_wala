@@ -47,7 +47,7 @@ const Staff = () => {
         setIsLoading(true);
         
         // Fetch all staff
-        const staffResponse = await fetch('http://localhost:3001/api/admin/getallusers', {
+        const staffResponse = await fetch('http://3.83.158.77:3001/api/admin/getallusers', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'application/json'
@@ -60,7 +60,7 @@ const Staff = () => {
         setFilteredStaff(staffData.data);
 
         // Fetch staff without attendance
-        const missingAttendanceResponse = await fetch('http://localhost:3001/api/admin/getUsersWithoutAttendanceToday', {
+        const missingAttendanceResponse = await fetch('http://3.83.158.77:3001/api/admin/getUsersWithoutAttendanceToday', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'application/json'
@@ -72,7 +72,7 @@ const Staff = () => {
         setStaffWithoutAttendance(missingAttendanceData.data);
 
         // Fetch today's attendance
-        const attendanceResponse = await fetch('http://localhost:3001/api/admin/getTodayAttendance', {
+        const attendanceResponse = await fetch('http://3.83.158.77:3001/api/admin/getTodayAttendance', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'application/json'
@@ -129,7 +129,7 @@ const Staff = () => {
     try {
       const today = new Date().toISOString().split('T')[0];
 
-      const response = await fetch('http://localhost:3001/api/admin/AddAttendance', {
+      const response = await fetch('http://3.83.158.77:3001/api/admin/AddAttendance', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -148,13 +148,13 @@ const Staff = () => {
       
       // Refresh data
       const [missingRes, todayRes] = await Promise.all([
-        fetch('http://localhost:3001/api/admin/getUsersWithoutAttendanceToday', {
+        fetch('http://3.83.158.77:3001/api/admin/getUsersWithoutAttendanceToday', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'application/json'
           }
         }),
-        fetch('http://localhost:3001/api/admin/getTodayAttendance', {
+        fetch('http://3.83.158.77:3001/api/admin/getTodayAttendance', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'application/json'
@@ -179,7 +179,7 @@ const Staff = () => {
   };
 
   const handleRemoveEmployee = async (userId: string) => {
-    const url = `http://localhost:3001/api/admin/removeUser?user_id=${userId}`;
+    const url = `http://3.83.158.77:3001/api/admin/removeUser?user_id=${userId}`;
     const data = await fetch(url)
     const jsonData = await data.json()
     console.log(jsonData)

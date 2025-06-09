@@ -54,7 +54,7 @@ const CustomerCreate = () => {
 
     try {
       setIsSubmitting(true);
-      const response = await fetch('http://localhost:3001/api/admin/AddCoustomer', {
+      const response = await fetch('http://3.83.158.77:3001/api/admin/AddCoustomer', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

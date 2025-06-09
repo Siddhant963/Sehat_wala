@@ -40,7 +40,7 @@ const CustomerEdit = () => {
         
         // Fetch customer data
         const customerResponse = await fetch(
-          `http://localhost:3001/api/admin/getallcoustomersbyfillter?_id=${id}`,
+          `http://3.83.158.77:3001/api/admin/getallcoustomersbyfillter?_id=${id}`,
           {
             headers: {
               'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -92,7 +92,7 @@ const CustomerEdit = () => {
     
     try {
       setIsSubmitting(true);
-      const response = await fetch('http://localhost:3001/api/admin/updateCoustomer', {
+      const response = await fetch('http://3.83.158.77:3001/api/admin/updateCoustomer', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

@@ -35,7 +35,7 @@ const DeliveryBoy = () => {
         }
 
         const response = await fetch(
-          `http://localhost:3001/api/deliveries/getUserOrder?email=${email}`,
+          `http://3.83.158.77:3001/api/deliveries/getUserOrder?email=${email}`,
           {
             headers: {
               'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -79,7 +79,7 @@ const DeliveryBoy = () => {
   const handleStatusUpdate = async (deliveryId: string, customerId: string, newStatus: OrderStatus) => {
     try {
       const response = await fetch(
-        `http://localhost:3001/api/deliveries/updateDelivery?delivery_id=${deliveryId}&customer_id=${customerId}&status=${newStatus}`,
+        `http://3.83.158.77:3001/api/deliveries/updateDelivery?delivery_id=${deliveryId}&customer_id=${customerId}&status=${newStatus}`,
         {
           method: 'post',
           headers: {

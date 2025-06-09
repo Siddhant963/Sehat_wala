@@ -34,7 +34,7 @@ const EditStaff = () => {
     const fetchStaffDetails = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3001/api/admin/getallusersbyfillter?_id=${id}`,
+          `http://3.83.158.77:3001/api/admin/getallusersbyfillter?_id=${id}`,
 
           { 
             headers: {
@@ -95,7 +95,7 @@ const EditStaff = () => {
         formBody.append('roles', role);
       });
 
-      const response = await fetch('http://localhost:3001/api/admin/updateUser', {
+      const response = await fetch('http://3.83.158.77:3001/api/admin/updateUser', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

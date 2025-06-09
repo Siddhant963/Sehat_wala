@@ -29,7 +29,7 @@ const Customers = () => {
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/admin/getallcoustomers', {
+        const response = await fetch('http://3.83.158.77:3001/api/admin/getallcoustomers', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'application/json'
@@ -85,7 +85,7 @@ const Customers = () => {
   };
 
   const handleRemoveCustomer = async (id: string) => {
-    const url = `http://localhost:3001/api/admin/removeCoustomer?coustomer_id=${id}`
+    const url = `http://3.83.158.77:3001/api/admin/removeCoustomer?coustomer_id=${id}`
     const token = localStorage.getItem('token')
     const headers = {
       'Authorization': `Bearer ${token}`,
