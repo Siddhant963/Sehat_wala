@@ -175,7 +175,10 @@ module.exports.getallcoustomers = async(req,res) => {
 }
 module.exports.getallusers = async(req,res) => {
      try {
-          const users = await Usermodel.find();
+          const users = await Usermodel.find({ roles: { $ne: 'admin' } }); // Exclude admin users
+          if(users.length === 0){
+               return res.status(404).json({message: "No users found"});
+          }
           return res.status(200).json({message: "Users fetched successfully", data: users});
      } catch (error) {
           return res.status(500).json({message: "Internal server error"});
@@ -221,7 +224,7 @@ module.exports.getallcoustomersbyfillter = async(req,res) => {
     
           // console.log("Filter criteria:", filter);
           
-          const coustomers = await Coustomermodel.find(filter);
+          const coustomers = await Coustomermodel.find(filter );
           if(coustomers.length === 0){
                return res.status(404).json({message: "No coustomers found"});
           }

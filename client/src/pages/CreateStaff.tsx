@@ -16,28 +16,87 @@ const CreateStaff = () => {
     total_salary: '',
     roles: ['staff'] // Default role is staff
   });
+  const [errors, setErrors] = useState({
+    name: '',
+    email: '',
+    password: '',
+    contact: '',
+    total_salary: ''
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
+  const validateField = (name: string, value: string) => {
+    let error = '';
+    
+    switch (name) {
+      case 'name':
+        if (!value.trim()) error = 'Name is required';
+        else if (!/^[a-zA-Z ]+$/.test(value)) error = 'Name should contain only letters';
+        break;
+      case 'email':
+        if (!value) error = 'Email is required';
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) error = 'Invalid email format';
+        break;
+      case 'password':
+        if (!value) error = 'Password is required';
+        else if (value.length < 6) error = 'Password must be at least 6 characters';
+        break;
+      case 'contact':
+        if (!value) error = 'Contact number is required';
+        else if (!/^\d+$/.test(value)) error = 'Contact should contain only numbers';
+        else if (value.length < 10 || value.length > 15) error = 'Contact should be 10-15 digits';
+        break;
+      case 'total_salary':
+        if (!value) error = 'Salary is required';
+        else if (!/^\d+$/.test(value)) error = 'Salary should be a number';
+        break;
+      default:
+        break;
+    }
+    
+    return error;
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    
+    // Validate the field as user types
+    const error = validateField(name, value);
+    
+    setErrors(prev => ({
+      ...prev,
+      [name]: error
+    }));
+    
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
   };
 
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = {...errors};
+    
+    // Validate all fields
+    Object.keys(formData).forEach(key => {
+      if (key !== 'roles') {
+        const error = validateField(key, formData[key as keyof typeof formData]);
+        newErrors[key as keyof typeof newErrors] = error;
+        if (error) isValid = false;
+      }
+    });
+    
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Basic validation
-    if (!formData.name || !formData.email || !formData.password || !formData.contact || !formData.total_salary) {
-      toast.error('Please fill in all required fields');
-      return;
-    }
-
-    if (isNaN(Number(formData.total_salary))) {
-      toast.error('Salary must be a number');
+    if (!validateForm()) {
+      toast.error('Please fix the errors in the form');
       return;
     }
 
@@ -100,6 +159,7 @@ const CreateStaff = () => {
                   className="bg-gray-200 p-4 h-14 text-black"
                   required
                 />
+                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
               </div>
               
               <div>
@@ -114,6 +174,7 @@ const CreateStaff = () => {
                   className="bg-gray-200 p-4 h-14 text-black"
                   required
                 />
+                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
               </div>
               
               <div>
@@ -128,6 +189,7 @@ const CreateStaff = () => {
                   className="bg-gray-200 p-4 h-14 text-black"
                   required
                 />
+                {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
               </div>
               
               <div>
@@ -141,6 +203,7 @@ const CreateStaff = () => {
                   className="bg-gray-200 p-4 h-14 text-black"
                   required
                 />
+                {errors.contact && <p className="text-red-500 text-sm mt-1">{errors.contact}</p>}
               </div>
               
               <div>
@@ -154,6 +217,7 @@ const CreateStaff = () => {
                   className="bg-gray-200 p-4 h-14 text-black"
                   required
                 />
+                {errors.total_salary && <p className="text-red-500 text-sm mt-1">{errors.total_salary}</p>}
               </div>
               
               <div>

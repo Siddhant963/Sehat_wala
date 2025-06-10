@@ -4,7 +4,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Star } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -29,7 +29,8 @@ const CustomerEdit = () => {
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -37,7 +38,6 @@ const CustomerEdit = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        
         // Fetch customer data
         const customerResponse = await fetch(
           `http://3.83.158.77:3001/api/admin/getallcoustomersbyfillter?_id=${id}`,
@@ -72,24 +72,46 @@ const CustomerEdit = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setCustomer(prev => prev ? {
-      ...prev,
-      [name]: value
-    } : null);
+    setCustomer(prev => prev ? { ...prev, [name]: value } : null);
+    setErrors(prev => ({ ...prev, [name]: '' })); // Clear error on change
   };
 
   const handlePaymentChange = (value: string) => {
-    setCustomer(prev => prev ? {
-      ...prev,
-      payment: value
-    } : null);
+    setCustomer(prev => prev ? { ...prev, payment: value } : null);
+  };
+
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+    if (!customer) return newErrors;
+
+    // Name validation
+    if (!/^[a-zA-Z\s]+$/.test(customer.name)) {
+      newErrors.name = 'Name must contain only letters and spaces.';
+    }
+
+    // Email validation
+    if (!/\S+@\S+\.\S+/.test(customer.email)) {
+      newErrors.email = 'Email is invalid.';
+    }
+
+    // Date validation
+    const startDate = new Date(customer.subscription_start_date);
+    const endDate = new Date(customer.subscription_end_date);
+    if (startDate >= endDate) {
+      newErrors.subscription_end_date = 'End date must be after start date.';
+    }
+
+    setErrors(newErrors);
+    return newErrors;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) return;
+
     if (!customer) return;
-    
+
     try {
       setIsSubmitting(true);
       const response = await fetch('http://3.83.158.77:3001/api/admin/updateCoustomer', {
@@ -127,14 +149,6 @@ const CustomerEdit = () => {
     }
   };
 
-  const calculateMealsLeft = (endDate: string): number => {
-    const today = new Date();
-    const end = new Date(endDate);
-    const diffTime = end.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays > 0 ? diffDays : 0;
-  };
-
   if (isLoading) {
     return (
       <div className="flex flex-col min-h-screen">
@@ -162,7 +176,6 @@ const CustomerEdit = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      
       <main className="flex-grow container mx-auto px-4 py-6 animate-fade-in">
         <div className="mb-6">
           <Link to="/customers" className="flex items-center text-neutral-dark">
@@ -170,26 +183,24 @@ const CustomerEdit = () => {
             <span>Back to Customers</span>
           </Link>
         </div>
-        
         <div className="card">
           <div className="bg-neutral-dark text-white p-4 mb-6">
             <h1 className="text-xl font-medium text-center">Edit Customer</h1>
           </div>
-          
           <form onSubmit={handleSubmit} className="p-4 space-y-4">
             <div className="space-y-4">
               <div>
-              <Label>Full Name</Label>
+                <Label>Full Name</Label>
                 <Input
                   name="name"
                   placeholder="Full Name"
                   value={customer.name}
                   onChange={handleChange}
-                  className="bg-gray-400 p-4 h-14"
+                  className={`bg-gray-400 p-4 h-14 ${errors.name ? 'border-red-500' : ''}`}
                   required
                 />
+                {errors.name && <div className="text-red-500">{errors.name}</div>}
               </div>
-              
               <div>
                 <Label>Email</Label>
                 <Input
@@ -198,11 +209,11 @@ const CustomerEdit = () => {
                   type="email"
                   value={customer.email}
                   onChange={handleChange}
-                  className="bg-gray-400 p-4 h-14"
+                  className={`bg-gray-400 p-4 h-14 ${errors.email ? 'border-red-500' : ''}`}
                   required
                 />
+                {errors.email && <div className="text-red-500">{errors.email}</div>}
               </div>
-              
               <div>
                 <Label>Contact Number</Label>
                 <Input
@@ -214,7 +225,6 @@ const CustomerEdit = () => {
                   required
                 />
               </div>
-              
               <div>
                 <Label>Address</Label>
                 <Input
@@ -226,7 +236,6 @@ const CustomerEdit = () => {
                   required
                 />
               </div>
-              
               <div>
                 <Label>Subscription</Label>
                 <Input
@@ -238,7 +247,6 @@ const CustomerEdit = () => {
                   required
                 />
               </div>
-              
               <div>
                 <Label>Subscription Start Date</Label>
                 <Input
@@ -249,7 +257,6 @@ const CustomerEdit = () => {
                   className="bg-gray-400 p-4 h-14"
                 />
               </div>
-              
               <div>
                 <Label>Subscription End Date</Label>
                 <Input
@@ -257,10 +264,10 @@ const CustomerEdit = () => {
                   type="date"
                   value={customer.subscription_end_date.split('T')[0]}
                   onChange={handleChange}
-                  className="bg-gray-400 p-4 h-14"
+                  className={`bg-gray-400 p-4 h-14 ${errors.subscription_end_date ? 'border-red-500' : ''}`}
                 />
+                {errors.subscription_end_date && <div className="text-red-500">{errors.subscription_end_date}</div>}
               </div>
-              
               <div>
                 <Label>Meals</Label>
                 <Input
@@ -272,24 +279,20 @@ const CustomerEdit = () => {
                   required
                 />
               </div>
-              
-            
               <div>
                 <Label>Meals Timing</Label>
                 <Input
-                      name="meals_timeing" 
-                      placeholder="Meals_type (e.g., lunch , dinner )"
-                      value={customer.meals_timeing || ''}
-                      onChange={handleChange}
-                      className="bg-gray-400 p-4 h-14"
-                      required
-                    />
-
+                  name="meals_timeing"
+                  placeholder="Meals_type (e.g., lunch, dinner)"
+                  value={customer.meals_timeing || ''}
+                  onChange={handleChange}
+                  className="bg-gray-400 p-4 h-14"
+                  required
+                />
               </div>
-              
               <div>
                 <Label>Payment Status</Label>
-                <Select 
+                <Select
                   value={customer.payment || 'Pending'}
                   onValueChange={handlePaymentChange}
                 >
@@ -302,17 +305,13 @@ const CustomerEdit = () => {
                   </SelectContent>
                 </Select>
               </div>
-              
-              
             </div>
-            
             <div className="border-t border-b py-4 my-6">
               <h3 className="text-xl font-medium mb-4">Meals left</h3>
               <div className="text-3xl text-center">
                 {customer.meals}
               </div>
             </div>
-            
             <button
               type="submit"
               disabled={isSubmitting}
@@ -323,7 +322,6 @@ const CustomerEdit = () => {
           </form>
         </div>
       </main>
-      
       <Footer />
     </div>
   );
