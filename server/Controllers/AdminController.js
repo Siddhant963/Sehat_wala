@@ -62,6 +62,11 @@ module.exports.AddCoustomer = async (req, res) => {
         // Split the meals_timeing string into an array
         const mealsTimingArray = meals_timeing.split(',').map(time => time.trim());
 
+        //meals timing to lower case 
+        for (let i = 0; i < mealsTimingArray.length; i++) {
+            mealsTimingArray[i] = mealsTimingArray[i].toLowerCase().trim();
+        }
+
         coustomer = new Coustomermodel({
             name,
             email,
