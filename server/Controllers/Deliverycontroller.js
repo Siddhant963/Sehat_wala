@@ -103,7 +103,7 @@ module.exports.getUserOrder = async (req, res) => {
         const today = new Date().toISOString().split('T')[0]; 
 
 
-        let orders = await Deliverymodel.find({ delivery_person_id: user._id , delivery_date: today  });
+        let orders = await Deliverymodel.find({ delivery_person_id: user._id , delivery_date: today  , status:  'assigned'  });
 
         if (orders.length === 0) {
             return res.status(404).json({ message: "No orders found for this user" });

@@ -25,56 +25,58 @@ interface DeliveryOrder {
 const DeliveryBoy = () => {
   const [orders, setOrders] = useState<DeliveryOrder[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [shouldRefresh, setShouldRefresh] = useState(false); // New state for refresh trigger
+
+  const fetchOrders = async () => {
+    try {
+      setIsLoading(true);
+      const email = localStorage.getItem('email');
+      if (!email) {
+        throw new Error('No email found in storage');
+      }
+
+      const response = await fetch(
+        `http://3.83.158.77:3001/api/deliveries/getUserOrder?email=${email}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch orders');
+      }
+
+      const data = await response.json();
+      
+      if (data.data && Array.isArray(data.data)) {
+        setOrders(data.data.map((order: any) => ({
+          _id: order._id,
+          customer_id: order.customer_id,
+          customer_name: order.customer_name || { name: 'Unknown', address: '', contact: '' },
+          delivery_date: order.delivery_date,
+          status: order.status,
+          created_at: order.created_at,
+          updated_at: order.updated_at,
+          delivery_person_id: order.delivery_person_id,
+          __v: order.__v
+        })));
+      } else {
+        setOrders([]);
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to load orders');
+    } finally {
+      setIsLoading(false);
+      setShouldRefresh(false); // Reset refresh trigger
+    }
+  };
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const email = localStorage.getItem('email');
-        if (!email) {
-          throw new Error('No email found in storage');
-        }
-
-        const response = await fetch(
-          `http://3.83.158.77:3001/api/deliveries/getUserOrder?email=${email}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`,
-              'Content-Type': 'application/json'
-            }
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch orders');
-        }
-
-        const data = await response.json();
-        
-        // Ensure the data is in the correct format
-        if (data.data && Array.isArray(data.data)) {
-          setOrders(data.data.map((order: any) => ({
-            _id: order._id,
-            customer_id: order.customer_id,
-            customer_name: order.customer_name || { name: 'Unknown', address: '', contact: '' },
-            delivery_date: order.delivery_date,
-            status: order.status,
-            created_at: order.created_at,
-            updated_at: order.updated_at,
-            delivery_person_id: order.delivery_person_id,
-            __v: order.__v
-          })));
-        } else {
-          setOrders([]);
-        }
-      } catch (error) {
-        toast.error(error instanceof Error ? error.message : 'Failed to load orders');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchOrders();
-  }, []);
+  }, [shouldRefresh]); // Run when shouldRefresh changes
 
   const handleStatusUpdate = async (deliveryId: string, customerId: string, newStatus: OrderStatus) => {
     try {
@@ -91,13 +93,16 @@ const DeliveryBoy = () => {
 
       if (!response.ok) {
         throw new Error('Failed to update order status');
+      }else{
+        toast.success(`Order status updated to ${newStatus}`);
+        window.location.reload(); // Refresh the page to reflect changes
       }
 
-      setOrders(orders.map(order => 
-        order._id === deliveryId ? { ...order, status: newStatus } : order
-      ));
       
-      toast.success(`Order status updated to ${newStatus}`);
+      
+      // // Trigger a refresh of the data
+      // setShouldRefresh(true);
+      
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to update status');
     }
@@ -154,7 +159,7 @@ const DeliveryBoy = () => {
                   handleStatusUpdate(order._id, order.customer_id, newStatus)
                 }
                 showAssignButton={false}
-                statusOptions={[ 'pending', 'delivered', 'cancelled']}
+                statusOptions={['pending', 'delivered', 'cancelled']}
                 additionalInfo={{
                   address: order.customer_name?.address || 'Address not provided',
                   contact: order.customer_name?.contact || 'Contact not provided',

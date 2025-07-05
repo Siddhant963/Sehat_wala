@@ -50,10 +50,12 @@ const Orders = () => {
   const [isAssigningDelivery, setIsAssigningDelivery] = useState(false);
   const [selectedDeliveryId, setSelectedDeliveryId] = useState<string | null>(null);
   const [selectedDeliveryPersonId, setSelectedDeliveryPersonId] = useState<string>('');
+  const [dateError, setDateError] = useState<string | null>(null);
 
+  const today = new Date().toISOString().split('T')[0];
   const [newDelivery, setNewDelivery] = useState({
     meal_type: 'lunch',
-    delivery_date: new Date().toISOString().split('T')[0],
+    delivery_date: today,
   });
 
   useEffect(() => {
@@ -110,7 +112,28 @@ const Orders = () => {
     }
   };
 
-  const handleCreateDelivery = async () => {
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedDate = e.target.value;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const selected = new Date(selectedDate);
+    
+    if (selected < today) {
+      setDateError('Selected date cannot be in the past');
+    } else {
+      setDateError(null);
+      setNewDelivery({ ...newDelivery, delivery_date: selectedDate });
+    }
+  };
+
+  const handleCreateDelivery = async (e: React.FormEvent) => {
+    e.preventDefault(); // Prevent page reload
+    
+    if (dateError) {
+      toast.error('Please select a valid date');
+      return;
+    }
+
     try {
       setIsCreatingDelivery(true);
 
@@ -132,14 +155,12 @@ const Orders = () => {
       if (!res.ok) {
         throw new Error(data.message || 'Failed to create deliveries');
       }
-      console.log(res);
-      
 
-      toast.success(`Successfully created  deliveries`);
+      toast.success(`${data.message || 'Deliveries created successfully'}`);
       await fetchDeliveries(filterStatus);
       setNewDelivery({
         meal_type: 'lunch',
-        delivery_date: new Date().toISOString().split('T')[0],
+        delivery_date: today,
       });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to create deliveries');
@@ -223,42 +244,48 @@ const Orders = () => {
               <DialogHeader>
                 <DialogTitle className="text-lg sm:text-xl">Create Deliveries for All Customers</DialogTitle>
               </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <Label>Meal Type</Label>
-                  <Select
-                    value={newDelivery.meal_type}
-                    onValueChange={(value) => setNewDelivery({ ...newDelivery, meal_type: value })}
+              <form onSubmit={handleCreateDelivery}>
+                <div className="space-y-4">
+                  <div>
+                    <Label>Meal Type</Label>
+                    <Select
+                      value={newDelivery.meal_type}
+                      onValueChange={(value) => setNewDelivery({ ...newDelivery, meal_type: value })}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select meal type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="breakfast">Breakfast</SelectItem>
+                        <SelectItem value="lunch">Lunch</SelectItem>
+                        <SelectItem value="dinner">Dinner</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label>Date</Label>
+                    <Input
+                      type="date"
+                      value={newDelivery.delivery_date}
+                      min={today}
+                      onChange={handleDateChange}
+                      className="w-full"
+                    />
+                    {dateError && (
+                      <p className="text-red-500 text-sm mt-1">{dateError}</p>
+                    )}
+                  </div>
+
+                  <Button
+                    type="submit"
+                    disabled={isCreatingDelivery || dateError !== null}
+                    className="w-full bg-teal-600 hover:bg-teal-700"
                   >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select meal type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="breakfast">Breakfast</SelectItem>
-                      <SelectItem value="lunch">Lunch</SelectItem>
-                      <SelectItem value="dinner">Dinner</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    {isCreatingDelivery ? 'Creating...' : 'Create Deliveries'}
+                  </Button>
                 </div>
-
-                <div>
-                  <Label>Date</Label>
-                  <Input
-                    type="date"
-                    value={newDelivery.delivery_date}
-                    onChange={(e) => setNewDelivery({ ...newDelivery, delivery_date: e.target.value })}
-                    className="w-full"
-                  />
-                </div>
-
-                <Button
-                  onClick={handleCreateDelivery}
-                  disabled={isCreatingDelivery}
-                  className="w-full bg-teal-600 hover:bg-teal-700"
-                >
-                  {isCreatingDelivery ? 'Creating...' : 'Create Deliveries'}
-                </Button>
-              </div>
+              </form>
             </DialogContent>
           </Dialog>
         </div>

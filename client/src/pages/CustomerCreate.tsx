@@ -9,13 +9,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const CustomerCreate = () => {
+  const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     contact: '',
     address: '',
     subscription: '',
-    subscription_start_date: '',
+    subscription_start_date: today, // Default to today
     subscription_end_date: '',
     meals: '',
     meals_timeing: '',
@@ -36,24 +37,35 @@ const CustomerCreate = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
-  // Validate end date when start date changes
+  // Validate dates when they change
   useEffect(() => {
+    const newErrors = {...errors};
+    
+    // Validate start date
+    if (formData.subscription_start_date) {
+      const startDate = new Date(formData.subscription_start_date);
+      const todayDate = new Date(today);
+      
+      if (startDate < todayDate) {
+        newErrors.subscription_start_date = 'Start date cannot be in the past';
+      } else {
+        newErrors.subscription_start_date = '';
+      }
+    }
+
+    // Validate end date against start date
     if (formData.subscription_start_date && formData.subscription_end_date) {
       const startDate = new Date(formData.subscription_start_date);
       const endDate = new Date(formData.subscription_end_date);
       
       if (endDate < startDate) {
-        setErrors(prev => ({
-          ...prev,
-          subscription_end_date: 'End date cannot be before start date'
-        }));
+        newErrors.subscription_end_date = 'End date cannot be before start date';
       } else {
-        setErrors(prev => ({
-          ...prev,
-          subscription_end_date: ''
-        }));
+        newErrors.subscription_end_date = '';
       }
     }
+
+    setErrors(newErrors);
   }, [formData.subscription_start_date, formData.subscription_end_date]);
 
   const validateField = (name: string, value: string) => {
@@ -129,6 +141,23 @@ const CustomerCreate = () => {
         if (error) isValid = false;
       }
     });
+    
+    // Additional date validation
+    if (formData.subscription_start_date && formData.subscription_end_date) {
+      const startDate = new Date(formData.subscription_start_date);
+      const endDate = new Date(formData.subscription_end_date);
+      const todayDate = new Date(today);
+      
+      if (startDate < todayDate) {
+        newErrors.subscription_start_date = 'Start date cannot be in the past';
+        isValid = false;
+      }
+      
+      if (endDate < startDate) {
+        newErrors.subscription_end_date = 'End date cannot be before start date';
+        isValid = false;
+      }
+    }
     
     setErrors(newErrors);
     return isValid;
@@ -255,6 +284,7 @@ const CustomerCreate = () => {
                     type="date"
                     value={formData.subscription_start_date}
                     onChange={handleChange}
+                    min={today} // Prevent selecting dates before today
                     className="bg-gray-200 p-4 h-14 w-full text-black"
                     required
                   />
@@ -267,6 +297,7 @@ const CustomerCreate = () => {
                     type="date"
                     value={formData.subscription_end_date}
                     onChange={handleChange}
+                    min={formData.subscription_start_date || today} // Prevent selecting dates before start date
                     className="bg-gray-200 p-4 h-14 w-full text-black"
                     required
                   />
