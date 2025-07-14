@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
@@ -48,7 +47,7 @@ const Orders = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isCreatingDelivery, setIsCreatingDelivery] = useState(false);
   const [isAssigningDelivery, setIsAssigningDelivery] = useState(false);
-  const [selectedDeliveryId, setSelectedDeliveryId] = useState<string | null>(null);
+  const [selectedDeliveryIds, setSelectedDeliveryIds] = useState<string[]>([]);
   const [selectedDeliveryPersonId, setSelectedDeliveryPersonId] = useState<string>('');
   const [dateError, setDateError] = useState<string | null>(null);
 
@@ -127,7 +126,7 @@ const Orders = () => {
   };
 
   const handleCreateDelivery = async (e: React.FormEvent) => {
-    e.preventDefault(); // Prevent page reload
+    e.preventDefault();
     
     if (dateError) {
       toast.error('Please select a valid date');
@@ -169,16 +168,16 @@ const Orders = () => {
     }
   };
 
-  const handleAssignDeliveryPerson = async (deliveryId: string) => {
+  const handleAssignDeliveryPerson = async () => {
     try {
-      if (!selectedDeliveryPersonId) {
-        throw new Error('Please select a delivery person');
+      if (!selectedDeliveryPersonId || selectedDeliveryIds.length === 0) {
+        throw new Error('Please select a delivery person and at least one delivery');
       }
 
       setIsAssigningDelivery(true);
 
       const formData = new URLSearchParams();
-      formData.append('delivery_id', deliveryId);
+      formData.append('delivery_id', selectedDeliveryIds.join(','));
       formData.append('delivery_person_id', selectedDeliveryPersonId);
 
       const res = await fetch('http://3.83.158.77:3001/api/admin/assignDeliveryPerson', {
@@ -196,7 +195,7 @@ const Orders = () => {
 
       toast.success('Delivery person assigned successfully');
       await fetchDeliveries(filterStatus);
-      setSelectedDeliveryId(null);
+      setSelectedDeliveryIds([]);
       setSelectedDeliveryPersonId('');
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to assign delivery person');
@@ -205,14 +204,13 @@ const Orders = () => {
     }
   };
 
-  const chartData = [
-    { name: 'Pending', value: deliveries.filter(d => d.status === 'pending').length },
-    { name: 'Delivered', value: deliveries.filter(d => d.status === 'delivered').length },
-    { name: 'Cancelled', value: deliveries.filter(d => d.status === 'cancelled').length },
-    { name: 'Assigned', value: deliveries.filter(d => d.status === 'assigned').length },
-  ].filter(item => item.value > 0);
-
-  const COLORS = ['#00C4C4', '#4CAF50', '#FF6B6B', '#6366F1'];
+  const toggleDeliverySelection = (deliveryId: string) => {
+    setSelectedDeliveryIds(prev => 
+      prev.includes(deliveryId) 
+        ? prev.filter(id => id !== deliveryId) 
+        : [...prev, deliveryId]
+    );
+  };
 
   if (isLoading) {
     return (
@@ -308,40 +306,49 @@ const Orders = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <div className="w-full">
-            <h2 className="text-xl font-semibold mb-4">Delivery Summary</h2>
-            <div className="w-full h-[250px] sm:h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={chartData}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    innerRadius={40}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                  >
-                    {chartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+        <div className="mb-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+          <Select
+            value={selectedDeliveryPersonId}
+            onValueChange={setSelectedDeliveryPersonId}
+          >
+            <SelectTrigger className="w-full sm:w-[250px]">
+              <SelectValue placeholder="Select delivery person" />
+            </SelectTrigger>
+            <SelectContent>
+              {users.map(user => (
+                <SelectItem key={user._id} value={user._id}>
+                  {user.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
+            onClick={handleAssignDeliveryPerson}
+            disabled={isAssigningDelivery || selectedDeliveryIds.length === 0 || !selectedDeliveryPersonId}
+            className="w-full sm:w-auto"
+          >
+            {isAssigningDelivery ? 'Assigning...' : `Assign ${selectedDeliveryIds.length} Delivery(ies)`}
+          </Button>
+        </div>
 
-          <div className="w-full">
-            <h2 className="text-xl font-semibold mb-4">Recent Deliveries</h2>
-            <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
-              {deliveries.map((delivery) => {
-                const deliveryDate = new Date(delivery.delivery_date).toLocaleDateString();
-                const createdAt = new Date(delivery.created_at).toLocaleString();
+        <div className="grid grid-cols-1 gap-4">
+          {deliveries.map((delivery) => {
+            const deliveryDate = new Date(delivery.delivery_date).toLocaleDateString();
+            const createdAt = new Date(delivery.created_at).toLocaleString();
+            
+            return (
+              <div key={delivery._id} className="border rounded-lg p-4 shadow-sm relative">
+                <div className="absolute top-2 right-2">
+                  <input
+                    type="checkbox"
+                    checked={selectedDeliveryIds.includes(delivery._id)}
+                    onChange={() => toggleDeliverySelection(delivery._id)}
+                    className="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                  />
+                </div>
                 
-                return (
-                  <div key={delivery._id} className="border rounded-lg p-3 sm:p-4 shadow-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div>
                     <p className="text-sm sm:text-base">
                       <strong>Customer:</strong> {delivery.customer_id?.name || 'N/A'}
                     </p>
@@ -351,7 +358,9 @@ const Orders = () => {
                     <p className="text-sm sm:text-base">
                       <strong>Address:</strong> {delivery.customer_id?.address || 'N/A'}
                     </p>
-
+                  </div>
+                  
+                  <div>
                     {delivery.meal_type && (
                       <p className="text-sm sm:text-base">
                         <strong>Meal Type:</strong> {delivery.meal_type}
@@ -374,51 +383,22 @@ const Orders = () => {
                     <p className="text-sm sm:text-base">
                       <strong>Created:</strong> {createdAt}
                     </p>
-
-                    {delivery.delivery_person_id ? (
-                      <div className="mt-2">
-                        <p className="text-sm sm:text-base">
-                          <strong>Delivery Person:</strong> {delivery.delivery_person_id.name}
-                        </p>
-                        <p className="text-sm sm:text-base">
-                          <strong>DP Contact:</strong> {delivery.delivery_person_id.contact}
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="mt-2 flex flex-col sm:flex-row sm:items-center gap-2">
-                        <Select
-                          value={selectedDeliveryId === delivery._id ? selectedDeliveryPersonId : ''}
-                          onValueChange={(value) => {
-                            setSelectedDeliveryId(delivery._id);
-                            setSelectedDeliveryPersonId(value);
-                          }}
-                        >
-                          <SelectTrigger className="w-full sm:w-[180px]">
-                            <SelectValue placeholder="Select delivery person" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {users.map(user => (
-                              <SelectItem key={user._id} value={user._id}>
-                                {user.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <Button
-                          onClick={() => handleAssignDeliveryPerson(delivery._id)}
-                          disabled={isAssigningDelivery || selectedDeliveryId !== delivery._id}
-                          size="sm"
-                          className="w-full sm:w-auto"
-                        >
-                          {isAssigningDelivery && selectedDeliveryId === delivery._id ? 'Assigning...' : 'Assign'}
-                        </Button>
-                      </div>
-                    )}
                   </div>
-                );
-              })}
-            </div>
-          </div>
+                </div>
+
+                {delivery.delivery_person_id && (
+                  <div className="mt-2 border-t pt-2">
+                    <p className="text-sm sm:text-base">
+                      <strong>Delivery Person:</strong> {delivery.delivery_person_id.name}
+                    </p>
+                    <p className="text-sm sm:text-base">
+                      <strong>DP Contact:</strong> {delivery.delivery_person_id.contact}
+                    </p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </main>
 

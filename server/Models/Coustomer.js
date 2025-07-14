@@ -5,12 +5,11 @@ mongoose.CoustomerSchema = new mongoose.Schema({
         required: true
     },
     email: {
-        type: String,
-        required: true
+        type: String
     },
     contact: {
         type: String,
-        required: true
+        required: true,
     },
     address: {
         type: String,
@@ -40,6 +39,10 @@ mongoose.CoustomerSchema = new mongoose.Schema({
     payment:{ 
         type: String,
         required: true
+    },
+    remainingAmount: {
+        type: Number,
+        default: 0
     },
     created_at: {
         type: Date,

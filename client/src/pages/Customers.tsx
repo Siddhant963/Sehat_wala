@@ -177,6 +177,7 @@ const Customers = () => {
                   day: 'numeric'
                 })}
                 mealsLeft={customer.meals}
+               contact={customer.contact}
                 status={customer.status}
                 onEdit={() => handleEditCustomer(customer._id)}
                 onRemove={() => handleRemoveCustomer(customer._id)} 

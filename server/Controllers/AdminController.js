@@ -44,11 +44,11 @@ module.exports.AddCoustomer = async (req, res) => {
     meals,
     meals_timeing, // This should be a comma-separated string from frontend
     payment,
+    remainingAmount
   } = req.body;
 
   if (
     !name ||
-    !email ||
     !contact ||
     !address ||
     !subscription ||
@@ -56,7 +56,7 @@ module.exports.AddCoustomer = async (req, res) => {
     !subscription_end_date ||
     !meals ||
     !meals_timeing ||
-    !payment
+    !payment 
   ) {
     return res.status(400).json({ message: "All fields are required" });
   }
@@ -79,7 +79,7 @@ module.exports.AddCoustomer = async (req, res) => {
 
     coustomer = new Coustomermodel({
       name,
-      email,
+      email: email || "", // Default to empty string if email is not provided
       contact,
       address,
       subscription,
@@ -88,6 +88,7 @@ module.exports.AddCoustomer = async (req, res) => {
       meals,
       meals_timeing: mealsTimingArray, // Save as array
       payment,
+      remainingAmount: remainingAmount || 0, // Default to 0 if not provided
     });
 
     await coustomer.save();
@@ -485,32 +486,41 @@ module.exports.createDeliveriesByMealType = async (req, res) => {
 };
 module.exports.assignDeliveryPerson = async (req, res) => {
   try {
-    const { delivery_person_id, delivery_id } = req.body;
+    let { delivery_person_id, delivery_id } = req.body;
 
     // Validate required fields
     if (!delivery_person_id || !delivery_id) {
       return res
         .status(400)
-        .json({ message: "Delivery person ID and delivery ID are required" });
+        .json({ message: "Delivery person ID and delivery ID(s) are required" });
     }
 
-    // Update the delivery
-    const updatedDelivery = await Deliverymodel.findByIdAndUpdate(
-      delivery_id,
+    // If delivery_id is a string of comma-separated IDs, convert it to an array
+    if (typeof delivery_id === "string") {
+      delivery_id = delivery_id.split(",").map(id => id.trim());
+    }
+
+    // Convert single value to array if not already
+    const deliveryIds = Array.isArray(delivery_id) ? delivery_id : [delivery_id];
+
+    // Update all matching deliveries
+    const updatedDeliveries = await Deliverymodel.updateMany(
+      { _id: { $in: deliveryIds } },
       {
-        delivery_person_id,
-        status: "assigned", // Update status to assigned
-      },
-      { new: true }
+        $set: {
+          delivery_person_id: delivery_person_id,
+          status: "assigned",
+        },
+      }
     );
 
-    if (!updatedDelivery) {
-      return res.status(404).json({ message: "Delivery not found" });
+    if (updatedDeliveries.matchedCount === 0) {
+      return res.status(404).json({ message: "No deliveries found to assign" });
     }
 
     return res.status(200).json({
-      message: "Delivery person assigned successfully",
-      data: updatedDelivery,
+      message: `Assigned ${deliveryIds.length} delivery(ies) to person ${delivery_person_id}`,
+      result: updatedDeliveries,
     });
   } catch (error) {
     console.error("Error assigning delivery person:", error);
@@ -520,6 +530,7 @@ module.exports.assignDeliveryPerson = async (req, res) => {
     });
   }
 };
+
 
 module.exports.getallDeliveries = async (req, res) => {
   try {

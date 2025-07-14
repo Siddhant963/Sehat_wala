@@ -6,6 +6,7 @@ type CustomerCardProps = {
   location: string;
   joinDate: string;
   mealsLeft: number;
+  contact?: string;
   status: 'Active' | 'Inactive';
   className?: string;
   onEdit?: () => void;
@@ -19,6 +20,7 @@ const CustomerCard = ({
   location, 
   joinDate, 
   mealsLeft, 
+  contact,
   status, 
   className,
   onEdit,
@@ -35,6 +37,7 @@ const CustomerCard = ({
           <p className="text-xs opacity-80">Location: {location}</p>
           <p className="text-xs opacity-80">Joined: {joinDate}</p>
           <p className="text-xs opacity-80">Meals Left: {mealsLeft}</p>
+          {contact && <p className="text-xs opacity-80">Contact: {contact}</p>}
         </div>
         <div className="flex flex-col gap-2">
           <button 

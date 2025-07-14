@@ -20,7 +20,8 @@ const CustomerCreate = () => {
     subscription_end_date: '',
     meals: '',
     meals_timeing: '',
-    payment: 'Pending'
+    payment: 'Pending',
+    remainingAmount: '' // Added remaining amount field
   });
 
   const [errors, setErrors] = useState({
@@ -31,7 +32,8 @@ const CustomerCreate = () => {
     subscription_start_date: '',
     subscription_end_date: '',
     meals: '',
-    meals_timeing: ''
+    meals_timeing: '',
+    remainingAmount: '' // Added error field for remaining amount
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,18 +43,6 @@ const CustomerCreate = () => {
   useEffect(() => {
     const newErrors = {...errors};
     
-    // Validate start date
-    if (formData.subscription_start_date) {
-      const startDate = new Date(formData.subscription_start_date);
-      const todayDate = new Date(today);
-      
-      if (startDate < todayDate) {
-        newErrors.subscription_start_date = 'Start date cannot be in the past';
-      } else {
-        newErrors.subscription_start_date = '';
-      }
-    }
-
     // Validate end date against start date
     if (formData.subscription_start_date && formData.subscription_end_date) {
       const startDate = new Date(formData.subscription_start_date);
@@ -65,8 +55,15 @@ const CustomerCreate = () => {
       }
     }
 
+    // Validate remaining amount when payment is Pending
+    if (formData.payment === 'Pending' && !formData.remainingAmount) {
+      newErrors.remainingAmount = 'Remaining amount is required for pending payments';
+    } else {
+      newErrors.remainingAmount = '';
+    }
+
     setErrors(newErrors);
-  }, [formData.subscription_start_date, formData.subscription_end_date]);
+  }, [formData.subscription_start_date, formData.subscription_end_date, formData.payment, formData.remainingAmount]);
 
   const validateField = (name: string, value: string) => {
     let error = '';
@@ -75,10 +72,6 @@ const CustomerCreate = () => {
       case 'name':
         if (!value.trim()) error = 'Name is required';
         else if (!/^[a-zA-Z ]+$/.test(value)) error = 'Name should contain only letters';
-        break;
-      case 'email':
-        if (!value) error = 'Email is required';
-        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) error = 'Invalid email format';
         break;
       case 'contact':
         if (!value) error = 'Contact number is required';
@@ -97,6 +90,13 @@ const CustomerCreate = () => {
         break;
       case 'meals':
         if (value && !/^\d+$/.test(value)) error = 'Meals should be a number';
+        break;
+      case 'remainingAmount':
+        if (formData.payment === 'Pending' && !value) {
+          error = 'Remaining amount is required';
+        } else if (value && !/^\d+$/.test(value)) {
+          error = 'Amount should be a number';
+        }
         break;
       default:
         break;
@@ -135,7 +135,7 @@ const CustomerCreate = () => {
     
     // Validate all fields
     Object.keys(formData).forEach(key => {
-      if (key !== 'payment' && key !== 'address' && key !== 'meals_timeing') {
+      if (key !== 'address' && key !== 'meals_timeing') {
         const error = validateField(key, formData[key as keyof typeof formData]);
         newErrors[key as keyof typeof newErrors] = error;
         if (error) isValid = false;
@@ -148,15 +148,16 @@ const CustomerCreate = () => {
       const endDate = new Date(formData.subscription_end_date);
       const todayDate = new Date(today);
       
-      if (startDate < todayDate) {
-        newErrors.subscription_start_date = 'Start date cannot be in the past';
-        isValid = false;
-      }
-      
       if (endDate < startDate) {
         newErrors.subscription_end_date = 'End date cannot be before start date';
         isValid = false;
       }
+    }
+
+    // Validate remaining amount for pending payments
+    if (formData.payment === 'Pending' && !formData.remainingAmount) {
+      newErrors.remainingAmount = 'Remaining amount is required for pending payments';
+      isValid = false;
     }
     
     setErrors(newErrors);
@@ -284,7 +285,6 @@ const CustomerCreate = () => {
                     type="date"
                     value={formData.subscription_start_date}
                     onChange={handleChange}
-                    min={today} // Prevent selecting dates before today
                     className="bg-gray-200 p-4 h-14 w-full text-black"
                     required
                   />
@@ -297,7 +297,7 @@ const CustomerCreate = () => {
                     type="date"
                     value={formData.subscription_end_date}
                     onChange={handleChange}
-                    min={formData.subscription_start_date || today} // Prevent selecting dates before start date
+                    min={formData.subscription_start_date || today}
                     className="bg-gray-200 p-4 h-14 w-full text-black"
                     required
                   />
@@ -342,6 +342,20 @@ const CustomerCreate = () => {
                   </SelectContent>
                 </Select>
               </div>
+
+              {formData.payment === 'Pending' && (
+                <div>
+                  <Label htmlFor="remainingAmount">Remaining Amount</Label>
+                  <Input
+                    name="remainingAmount"
+                    placeholder="Enter remaining amount"
+                    value={formData.remainingAmount}
+                    onChange={handleChange}
+                    className="bg-gray-200 p-4 h-14 w-full text-black"
+                  />
+                  {errors.remainingAmount && <p className="text-red-500 text-sm mt-1">{errors.remainingAmount}</p>}
+                </div>
+              )}
             </div>
 
             <button

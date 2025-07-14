@@ -219,6 +219,7 @@ const ViewAttendance = () => {
                         <SelectContent>
                           <SelectItem value="present" className="text-xs sm:text-sm">Present</SelectItem>
                           <SelectItem value="absent" className="text-xs sm:text-sm">Absent</SelectItem>
+                          <SelectItem value="half-day" className="text-xs sm:text-sm">Half Day</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
