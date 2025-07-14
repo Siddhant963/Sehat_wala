@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import { UserPlus, Search, CalendarCheck, CheckCircle2, XCircle } from 'lucide-react';
+import { UserPlus, Search, CalendarCheck, CheckCircle2, XCircle, Clock } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -25,7 +25,7 @@ interface AttendanceRecord {
     contact: string;
   };
   date: string;
-  status: 'present' | 'absent';
+  status: 'present' | 'absent' | 'half-day'; // Added half-day status
   created_at: string;
   updated_at: string;
   __v: number;
@@ -125,7 +125,7 @@ const Staff = () => {
     window.location.href = '/staff/MarkAttendance';
   };
 
-  const handleAttendanceChange = async (userId: string, status: string) => {
+  const handleAttendanceChange = async (userId: string, status: 'present' | 'absent' | 'half-day') => {
     try {
       const today = new Date().toISOString().split('T')[0];
 
@@ -309,7 +309,7 @@ const Staff = () => {
           )}
         </div>
 
-        {/* Attendance Tracker Section - Updated */}
+        {/* Attendance Tracker Section - Updated with Half-Day */}
         <div>
           <h2 className="text-lg sm:text-xl font-medium mb-3">Today's Attendance</h2>
 
@@ -337,10 +337,15 @@ const Staff = () => {
                             <CheckCircle2 className="mr-1" size={18} />
                             <span className="capitalize text-sm sm:text-base">Present</span>
                           </div>
-                        ) : (
+                        ) : record.status === 'absent' ? (
                           <div className="flex items-center text-red-600">
                             <XCircle className="mr-1" size={18} />
                             <span className="capitalize text-sm sm:text-base">Absent</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center text-yellow-600">
+                            <Clock className="mr-1" size={18} />
+                            <span className="capitalize text-sm sm:text-base">Half-Day</span>
                           </div>
                         )}
                       </div>
@@ -351,6 +356,54 @@ const Staff = () => {
             </div>
           )}
         </div>
+
+        {/* Mark Attendance Section for Missing Attendance */}
+        {showMissingAttendance && staffWithoutAttendance.length > 0 && (
+          <div className="mt-6">
+            <h2 className="text-lg sm:text-xl font-medium mb-3">Mark Attendance</h2>
+            <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+              <div className="divide-y">
+                {staffWithoutAttendance.map(member => (
+                  <div key={member._id} className="p-3 sm:p-4 hover:bg-gray-50 transition-colors">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex-1">
+                        <h3 className="font-medium text-sm sm:text-base">{member.name}</h3>
+                        <p className="text-xs sm:text-sm text-gray-500">Contact: {member.contact}</p>
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 text-xs sm:text-sm"
+                          onClick={() => handleAttendanceChange(member._id, 'present')}
+                        >
+                          Present
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 text-xs sm:text-sm"
+                          onClick={() => handleAttendanceChange(member._id, 'half-day')}
+                        >
+                          Half-Day
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 text-xs sm:text-sm"
+                          onClick={() => handleAttendanceChange(member._id, 'absent')}
+                        >
+                          Absent
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
       <Footer />

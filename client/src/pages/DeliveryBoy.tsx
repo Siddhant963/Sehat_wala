@@ -153,6 +153,7 @@ const DeliveryBoy = () => {
                 key={order._id}
                 orderId={order._id}
                 customer={order.customer_name?.name || 'Unknown Customer'}
+                //only show the date 
                 meal={new Date(order.delivery_date).toLocaleDateString()}
                 status={order.status}
                 onStatusChange={(newStatus) => 
@@ -163,7 +164,7 @@ const DeliveryBoy = () => {
                 additionalInfo={{
                   address: order.customer_name?.address || 'Address not provided',
                   contact: order.customer_name?.contact || 'Contact not provided',
-                  deliveryDate: new Date(order.delivery_date).toLocaleString()
+                  deliveryDate: new Date(order.delivery_date).toLocaleDateString()
                 }}
               />
             ))}
